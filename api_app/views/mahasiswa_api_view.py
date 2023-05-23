@@ -6,9 +6,13 @@ from ..repositories.mahasiswa_repository import MahasiswaRepository
 from ..permissions.kaprodi_permission import KaprodiPermission
 from ..serializers.mahasiswa_serializer import MahasiswaSerializer
 
-class MahasiswaListAPIView(APIView):
+class MahasiswaAPIView(APIView):
   mahasiswa_repository = MahasiswaRepository()
 
+  class Meta:
+    abstract=True
+
+class MahasiswaListAPIView(MahasiswaAPIView):
   def get(self, request):
     mahasiswa = self.mahasiswa_repository.find_all()
     return Response(MahasiswaSerializer(mahasiswa, many=True).data)
@@ -20,9 +24,7 @@ class MahasiswaListAPIView(APIView):
       return Response({'id': mahasiswa_id}, status=201)
     return Response(status=400)
   
-class MahasiswaDetailAPIView(APIView):
-  mahasiswa_repository = MahasiswaRepository()
-
+class MahasiswaDetailAPIView(MahasiswaAPIView):
   def get(self, request, nim):
     mahasiswa = self.mahasiswa_repository.find_by_nim(nim)
     if mahasiswa is not None:
@@ -43,9 +45,7 @@ class MahasiswaDetailAPIView(APIView):
       return Response(status=204)
     return Response(status=404)
 
-class MahasiswaLoginAPIView(APIView):
-  mahasiswa_repository = MahasiswaRepository()
-
+class MahasiswaLoginAPIView(MahasiswaAPIView):
   def post(self, request):
     nim = request.data.get('nim')
     password = request.data.get('password')

@@ -4,9 +4,13 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from ..repositories.kaprodi_repository import KaprodiRepository
 from ..serializers.kaprodi_serializer import KaprodiSerializer
 
-class KaprodiListAPIView(APIView):
+class KaprodiAPIView(APIView):
   kaprodi_repository = KaprodiRepository()
 
+  class Meta:
+    abstract=True
+
+class KaprodiListAPIView(KaprodiAPIView):
   def get(self, request):
     kaprodi_list = self.kaprodi_repository.find_all()
     return Response(KaprodiSerializer(kaprodi_list, many=True).data)
@@ -17,9 +21,7 @@ class KaprodiListAPIView(APIView):
       return Response({'id': kaprodi_id}, status=201)
     return Response(status=400)
 
-class KaprodiDetailAPIView(APIView):
-  kaprodi_repository = KaprodiRepository()
-
+class KaprodiDetailAPIView(KaprodiAPIView):
   def get(self, request, nip):
     kaprodi = self.kaprodi_repository.find_by_nip(nip)
     if kaprodi is not None:
@@ -39,9 +41,7 @@ class KaprodiDetailAPIView(APIView):
       return Response(status=204)
     return Response(status=404)
 
-class KaprodiLoginAPIView(APIView):
-  kaprodi_repository = KaprodiRepository()
-
+class KaprodiLoginAPIView(KaprodiAPIView):
   def post(self, request):
     nip = request.data.get('nip')
     password = request.data.get('password')
