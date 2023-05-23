@@ -1,13 +1,14 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from ..repositories.kaprodi_repository import KaprodiRepository
+from ..serializers.kaprodi_serializer import KaprodiSerializer
 
 class KaprodiListAPIView(APIView):
   kaprodi_repository = KaprodiRepository()
 
   def get(self, request):
-    kaprodi = self.kaprodi_repository.find_all()
-    return Response(kaprodi)
+    kaprodi_list = self.kaprodi_repository.find_all()
+    return Response(KaprodiSerializer(kaprodi_list, many=True).data)
 
 class KaprodiDetailAPIView(APIView):
   kaprodi_repository = KaprodiRepository()
@@ -15,7 +16,7 @@ class KaprodiDetailAPIView(APIView):
   def get(self, request, nip):
     kaprodi = self.kaprodi_repository.find_by_nip(nip)
     if kaprodi is not None:
-      return Response(kaprodi)
+      return Response(KaprodiSerializer(kaprodi).data)
     return Response(status=404)
 
   def post(self, request):
@@ -35,3 +36,16 @@ class KaprodiDetailAPIView(APIView):
     if success:
       return Response(status=204)
     return Response(status=404)
+
+class KaprodiLoginAPIView(APIView):
+  kaprodi_repository = KaprodiRepository()
+
+  def post(self, request):
+    nip = request.data.get('nip')
+    password = request.data.get('password')
+
+    kaprodi = self.kaprodi_repository.find_by_nip(nip=nip)
+    if kaprodi.check_password(password):
+      return Response(status=200)
+    else:
+      return Response(status=400)
