@@ -22,9 +22,11 @@ class KaprodiRepository:
     hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
     data['password'] = hashed_password.decode()
 
-    kaprodi = Kaprodi(**data)
-    kaprodi.save()
-    return kaprodi.id
+    try:
+      kaprodi = Kaprodi.objects.create(**data)
+      return kaprodi.id
+    except Exception as e:
+      return None
 
   def update(self, nip, data):
     try:

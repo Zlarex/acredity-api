@@ -1,5 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
 from ..repositories.kaprodi_repository import KaprodiRepository
 from ..serializers.kaprodi_serializer import KaprodiSerializer
 
@@ -45,7 +46,9 @@ class KaprodiLoginAPIView(APIView):
     password = request.data.get('password')
 
     kaprodi = self.kaprodi_repository.find_by_nip(nip=nip)
-    if kaprodi.check_password(password):
-      return Response(status=200)
+    if kaprodi is not None and kaprodi.check_password(password):
+      refresh = RefreshToken.for_user(kaprodi)
+      serializer = KaprodiSerializer(kaprodi)
+      return Response({'refresh': str(refresh), 'access': str(refresh.access_token), 'user': serializer.data}, status=200)
     else:
       return Response(status=400)
