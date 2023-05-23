@@ -1,8 +1,8 @@
 import bcrypt
-from ..models.mahasiswa import Mahasiswa
-from ..serializers.mahasiswa_serializer import MahasiswaSerializer
+from ..models.kaprodi import Kaprodi
+from ..serializers.kaprodi_serializer import KaprodiSerializer
 
-class MahasiswaRepository:
+class KaprodiRepository:
   _instance = None
 
   def __new__(cls, *args, **kwargs):
@@ -11,49 +11,49 @@ class MahasiswaRepository:
     return cls._instance
 
   def find_all(self):
-    mahasiswa = Mahasiswa.objects.all()
-    serializer = MahasiswaSerializer(mahasiswa, many=True)
+    kaprodi = Kaprodi.objects.all()
+    serializer = KaprodiSerializer(kaprodi, many=True)
     return serializer.data
   
-  def find_by_nim(self, nim):
+  def find_by_nip(self, nip):
     try:
-      mahasiswa = Mahasiswa.objects.get(nim=nim)
-      serializer = MahasiswaSerializer(mahasiswa)
+      kaprodi = Kaprodi.objects.get(nip=nip)
+      serializer = KaprodiSerializer(kaprodi)
       return serializer.data
-    except Mahasiswa.DoesNotExist:
+    except Kaprodi.DoesNotExist:
       return None
-
+  
   def create(self, data):
     password = data.pop('password')
     hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
     data['password'] = hashed_password.decode()
 
-    serializer = MahasiswaSerializer(data=data)
+    serializer = KaprodiSerializer(data=data)
     if serializer.is_valid():
-      mahasiswa = serializer.save()
-      return mahasiswa.id
+      kaprodi = serializer.save()
+      return kaprodi.id
     return None
-
-  def update(self, nim, data):
+  
+  def update(self, nip, data):
     try:
-      mahasiswa = Mahasiswa.objects.get(nim=nim)
+      kaprodi = kaprodi.objects.get(nip=nip)
       password = data.pop('password', None)
       if password is not None:
         hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
         data['password'] = hashed_password.decode()
 
-      serializer = MahasiswaSerializer(instance=mahasiswa, data=data, partial=True)
+      serializer = KaprodiSerializer(instance=kaprodi, data=data, partial=True)
       if serializer.is_valid():
         serializer.save()
         return True
       return False
-    except Mahasiswa.DoesNotExist:
+    except Kaprodi.DoesNotExist:
       return False
 
-  def delete(self, nim):
+  def delete(self, nip):
     try:
-      mahasiswa = Mahasiswa.objects.get(nim=nim)
-      mahasiswa.delete()
+      kaprodi = kaprodi.objects.get(nip=nip)
+      kaprodi.delete()
       return True
-    except Mahasiswa.DoesNotExist:
+    except Kaprodi.DoesNotExist:
       return False
