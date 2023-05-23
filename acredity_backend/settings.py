@@ -89,7 +89,7 @@ WSGI_APPLICATION = 'acredity_backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'acredity_backend',
+        'NAME': 'db_acredity',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',

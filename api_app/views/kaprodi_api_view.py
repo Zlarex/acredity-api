@@ -10,6 +10,12 @@ class KaprodiListAPIView(APIView):
   def get(self, request):
     kaprodi_list = self.kaprodi_repository.find_all()
     return Response(KaprodiSerializer(kaprodi_list, many=True).data)
+  
+  def post(self, request):
+    kaprodi_id = self.kaprodi_repository.create(request.data)
+    if kaprodi_id is not None:
+      return Response({'id': kaprodi_id}, status=201)
+    return Response(status=400)
 
 class KaprodiDetailAPIView(APIView):
   kaprodi_repository = KaprodiRepository()
@@ -20,11 +26,6 @@ class KaprodiDetailAPIView(APIView):
       return Response(KaprodiSerializer(kaprodi).data)
     return Response(status=404)
 
-  def post(self, request):
-    kaprodi_id = self.kaprodi_repository.create(request.data)
-    if kaprodi_id is not None:
-      return Response({'id': kaprodi_id}, status=201)
-    return Response(status=400)
 
   def put(self, request, nip):
     success = self.kaprodi_repository.update(nip, request.data)
