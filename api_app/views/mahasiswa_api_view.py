@@ -1,10 +1,23 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from ...repositories.mahasiswa_repository import MahasiswaRepository
+from ..repositories.mahasiswa_repository import MahasiswaRepository
 
-class MahasiswaDetailAPIView(APIView):
+class MahasiswaListAPIView(APIView):
   mahasiswa_repository = MahasiswaRepository()
 
+  def get(self, request):
+    mahasiswa = self.mahasiswa_repository.find_all()
+    return Response(mahasiswa)
+
+  def post(self, request):
+    mahasiswa_id = self.mahasiswa_repository.create(request.data)
+    if mahasiswa_id is not None:
+      return Response({'id': mahasiswa_id}, status=201)
+    return Response(status=400)
+  
+class MahasiswaDetailAPIView(APIView):
+  mahasiswa_repository = MahasiswaRepository()
+  
   def get(self, request, nim):
     mahasiswa = self.mahasiswa_repository.find_by_nim(nim)
     if mahasiswa is not None:
