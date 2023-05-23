@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.tokens import RefreshToken
 from ..repositories.mahasiswa_repository import MahasiswaRepository
 from ..permissions.kaprodi_permission import KaprodiPermission
 from ..serializers.mahasiswa_serializer import MahasiswaSerializer
@@ -41,3 +42,18 @@ class MahasiswaDetailAPIView(APIView):
     if success:
       return Response(status=204)
     return Response(status=404)
+
+class MahasiswaLoginAPIView(APIView):
+  mahasiswa_repository = MahasiswaRepository()
+
+  def post(self, request):
+    nim = request.data.get('nim')
+    password = request.data.get('password')
+
+    mahasiswa = self.mahasiswa_repository.find_by_nim(nim=nim)
+    if mahasiswa is not None and mahasiswa.check_password(password):
+      refresh = RefreshToken.for_user(mahasiswa)
+      serializer = MahasiswaSerializer(mahasiswa)
+      return Response({'refresh': str(refresh), 'access': str(refresh.access_token), 'user': serializer.data}, status=200)
+    else:
+      return Response(status=400)
