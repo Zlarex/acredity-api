@@ -44,8 +44,6 @@ class MahasiswaRepository:
     except Mahasiswa.DoesNotExist:
       return False
 
-
-
   def delete(self, nim):
     try:
       mahasiswa = Mahasiswa.objects.get(nim=nim)

@@ -1,10 +1,13 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from ..repositories.dosen_repository import DosenRepository
 from ..serializers.dosen_serializer import DosenSerializer
+from ..permissions.kaprodi_permission import KaprodiPermission
 
 class DosenAPIView(APIView):
+  permission_classes = [KaprodiPermission]
   dosen_repository = DosenRepository()
 
   class Meta:
@@ -42,6 +45,7 @@ class DosenDetailAPIView(DosenAPIView):
     return Response(status=404)
 
 class DosenLoginAPIView(DosenAPIView):
+  permission_classes = []
   def post(self, request):
     nip = request.data.get('nip')
     password = request.data.get('password')

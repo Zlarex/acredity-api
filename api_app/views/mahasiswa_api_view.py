@@ -9,6 +9,7 @@ from ..serializers.mahasiswa_serializer import MahasiswaSerializer
 from ..serializers.item_akreditasi_serializer import ItemAkreditasiMahasiswaSerializer
 
 class MahasiswaAPIView(APIView):
+  permission_classes = [KaprodiPermission]
   mahasiswa_repository = MahasiswaRepository()
   item_akreditasi_repository = ItemAkreditasiMahasiswaRepository()
 
@@ -21,7 +22,6 @@ class MahasiswaListAPIView(MahasiswaAPIView):
     return Response(MahasiswaSerializer(mahasiswa, many=True).data)
 
   def post(self, request):
-    permission_classes = [IsAuthenticated, KaprodiPermission]
     mahasiswa_id = self.mahasiswa_repository.create(request.data)
     if mahasiswa_id is not None:
       return Response({'id': mahasiswa_id}, status=201)
@@ -35,20 +35,19 @@ class MahasiswaDetailAPIView(MahasiswaAPIView):
     return Response(status=404)
 
   def put(self, request, nim):
-    permission_classes = [IsAuthenticated, KaprodiPermission]
     success = self.mahasiswa_repository.update(nim, request.data)
     if success is not None:
       return Response(status=200)
     return Response(status=400)
 
   def delete(self, request, nim):
-    permission_classes = [IsAuthenticated, KaprodiPermission]
     success = self.mahasiswa_repository.delete(nim)
     if success:
       return Response(status=204)
     return Response(status=404)
 
 class MahasiswaLoginAPIView(MahasiswaAPIView):
+  permission_classes = []
   def post(self, request):
     nim = request.data.get('nim')
     password = request.data.get('password')
